@@ -1,7 +1,7 @@
 {
-    "AUTHOR" : "willamette",
-    "INSTALL_MSG" : "thanks for installing! for support, please contact me on discord (willamette#7412)",
-    "NAME" : "willamette-cogs",
-    "SHORT" : "some cogs i've made for Red V3",
-    "DESCRIPTION" : "cogs i've made for Red V3"
+    "author" : ["willamette"],
+    "install_msg" : "thanks for installing! for support, please contact me on discord (willamette#7412)",
+    "name" : "willamette-cogs",
+    "short" : "some cogs i've made for Red V3",
+    "description" : "cogs i've made for Red V3"
 }
