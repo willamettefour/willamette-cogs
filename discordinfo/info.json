@@ -1,0 +1,13 @@
+{
+    "author": ["willamette"],
+    "install_msg": "thanks for installing `discordinfo`!",
+    "name": "discordinfo",
+    "short": "Get info on users, servers, and other things on Discord.",
+    "description": "Get info on users, servers, and other things on Discord.",
+    "disabled": false,
+    "requirements": ["requests", "reactionmenu<=2.0.4"],
+    "permissions": ["embed_links"],
+    "min_python_version": [3, 7, 0],
+    "max_bot_version": "3.4.26",
+    "end_user_data_statement": "This cog does not persistently store data or metadata about users."
+  }
