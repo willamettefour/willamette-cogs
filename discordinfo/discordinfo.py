@@ -1,8 +1,9 @@
-from reactionmenu import ReactionMenu, Button, ButtonType
-from redbot.core import commands
 import discord
 import requests
 import time
+
+from reactionmenu import ReactionMenu, Button, ButtonType
+from redbot.core import commands
 
 class DiscordInfo(commands.Cog):
     """Get info on users, servers, and other things on Discord."""
@@ -198,16 +199,16 @@ class DiscordInfo(commands.Cog):
         percent = int((bot_count/count)*100)
         gay = "human"
         if human > 1:
-            gay = "humans"
+            gay += "s"
         sex = "bot"
         if bot_count > 1:
-            sex = "bots"
+            sex += "s"
         embed.add_field(name="membership", value=f"{count} members \n{human} {gay} / {bot_count} {sex} ({percent}%)\n:crown: <@{ctx.guild.owner_id}>")
         embed.add_field(name="created on", value=f"<t:{heathen}:D> (<t:{heathen}:R>)", inline=False)
         if ctx.guild.icon_url:
             embed.set_thumbnail(url=str(ctx.guild.icon_url) + "&quality=lossless")
         if ctx.guild.is_icon_animated():
-            embed.set_thumbnail(url=ctx.guild.icon_url_as(format="gif", size=2048))
+            embed.set_thumbnail(url=ctx.guild.icon_url_as(format="gif"))
         embed.set_footer(text=f"dates are in UTC time \nID: {ctx.guild.id}")
         if ctx.guild.splash:
             if ctx.guild.banner is None:
@@ -344,7 +345,7 @@ class DiscordInfo(commands.Cog):
 
     @commands.command()
     async def emojiinfo(self, ctx, emoji: discord.Emoji):
-        """Get info on a custom emoji (BETA)."""
+        """Get info on a custom emoji."""
         # Your code will go here
         embed = discord.Embed(title=emoji.name, color=await ctx.embed_color())
         heathen = int(time.mktime(emoji.created_at.timetuple()))
