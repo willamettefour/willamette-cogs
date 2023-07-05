@@ -1,7 +1,8 @@
-from reactionmenu import ViewMenu, ViewButton
-from redbot.core import commands
 import discord
 import time
+
+from reactionmenu import ViewMenu, ViewButton
+from redbot.core import commands
 
 class DiscordInfo(commands.Cog):
     """Get info on users, servers, and other things on Discord."""
