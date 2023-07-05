@@ -1,4 +1,6 @@
 from .discordinfo import DiscordInfo
 
-def setup(bot):
-    bot.add_cog(DiscordInfo(bot))
+
+async def setup(bot):
+    cog = DiscordInfo(bot)
+    await bot.add_cog(cog)
