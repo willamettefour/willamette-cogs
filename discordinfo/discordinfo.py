@@ -169,10 +169,8 @@ class DiscordInfo(commands.Cog):
         menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, show_page_director=False, all_can_click=False)
         embed.add_field(name="membership", value=f"{count} members \n{human} {gay} / {bot_count} {sex} ({percent}%)\n:crown: <@{ctx.guild.owner_id}>")
         embed.add_field(name="created on", value=f"<t:{heathen}:D> (<t:{heathen}:R>)", inline=False)
-        embed.set_thumbnail(url=str(ctx.guild.icon.replace(size=1024, format="webp")) + "?quality=lossless")
-        if ctx.guild.icon.is_animated():
-            embed.set_thumbnail(url=ctx.guild.icon)
-        embed.set_footer(text=f"dates are in UTC time \nID: {ctx.guild.id} \n")
+        embed.set_thumbnail(url=ctx.guild.icon if ctx.guild.icon.is_animated() else str(ctx.guild.icon.replace(size=1024, format="webp")) + "?quality=lossless")
+        embed.set_footer(text=f"ID: {ctx.guild.id} \n")
         if ctx.guild.splash:
             if ctx.guild.banner is None:
                 embed.add_field(name="\u200b", value="**invite splash**")
@@ -223,7 +221,7 @@ class DiscordInfo(commands.Cog):
         embed.add_field(name="represents discord officially?", value=value, inline=False)
         value="❌" if user.public_flags.spammer is False else "✅"
         embed.add_field(name="known spammer?", value=value, inline=False)
-        embed.set_footer(text=f"dates are in UTC time \nID: {user.id}")
+        embed.set_footer(text=f"ID: {user.id}")
         if member:
             if member.guild_avatar:
                 embed.add_field(name="note", value="global avatar currently displayed", inline=False)
@@ -321,8 +319,7 @@ class DiscordInfo(commands.Cog):
         embed = discord.Embed(title=emoji.name, color=await ctx.embed_color())
         heathen = int(time.mktime(emoji.created_at.timetuple()))
         embed.add_field(name="emoji created:", value=f"<t:{heathen}:D> (<t:{heathen}:R>)")
-        value="✅" if emoji.animated else "❌"
-        embed.add_field(name="animated?", value=value, inline=False)
+        embed.add_field(name="animated?", value="✅" if emoji.animated else "❌", inline=False)
         embed.set_thumbnail(url=emoji.url if emoji.animated else emoji.url.replace(".png", ".webp?quality=lossless"))
-        embed.set_footer(text=f"dates are in UTC time \nID: {emoji.id}")
+        embed.set_footer(text=f"ID: {emoji.id}")
         await ctx.send(embed=embed)
