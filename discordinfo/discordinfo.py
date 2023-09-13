@@ -169,7 +169,7 @@ class DiscordInfo(commands.Cog):
         menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, show_page_director=False, all_can_click=False)
         embed.add_field(name="membership", value=f"{count} members \n{human} {gay} / {bot_count} {sex} ({percent}%)\n:crown: <@{ctx.guild.owner_id}>")
         embed.add_field(name="created on", value=f"<t:{heathen}:D> (<t:{heathen}:R>)", inline=False)
-        embed.set_thumbnail(url=ctx.guild.icon if ctx.guild.icon.is_animated() else str(ctx.guild.icon.replace(size=1024, format="webp")) + "?quality=lossless")
+        embed.set_thumbnail(url=ctx.guild.icon if ctx.guild.icon.is_animated() else str(ctx.guild.icon.replace(size=1024, format="webp")) + "&quality=lossless")
         embed.set_footer(text=f"ID: {ctx.guild.id} \n")
         if ctx.guild.splash:
             if ctx.guild.banner is None:
@@ -194,6 +194,10 @@ class DiscordInfo(commands.Cog):
                 embed.set_image(url=ctx.guild.banner)
                 await ctx.send(embed=embed)
         else:
+            if ctx.guild.icon.is_animated() is False:
+                png = ctx.guild.icon.replace(size=1024, format="png")
+                jpg = ctx.guild.icon.replace(size=1024, format="jpeg")
+                embed.add_field(name="icon also available as", value=f"[png]({png}), [jpeg]({jpg})")
             await ctx.send(embed=embed)
 
     @commands.command()
