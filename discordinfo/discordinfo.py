@@ -103,6 +103,7 @@ class DiscordInfo(commands.Cog):
         """Get a user's banner."""
         if user is None:
             user = ctx.author
+        user = await self.bot.fetch_user(user.id)
         if user.banner is None:
             if user is ctx.author:
                 await ctx.send("you haven't set a custom banner image!")
@@ -146,7 +147,7 @@ class DiscordInfo(commands.Cog):
     @commands.guild_only()
     @commands.command()
     async def serverinfo(self, ctx):
-        """Gets info on the server."""
+        """Get info on the current server."""
         embed = discord.Embed(title=ctx.guild.name, description=ctx.guild.description, color=await ctx.embed_color())
         bit = int(ctx.guild.bitrate_limit//1000)
         embed.add_field(name="perks", value=f"file limit: `{ctx.guild.filesize_limit//1048576}MB`\nemoji limit: `{ctx.guild.emoji_limit}`\nbitrate limit: `{bit}kbps`")
