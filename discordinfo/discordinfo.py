@@ -12,10 +12,7 @@ class DiscordInfo(commands.Cog):
 
     async def build_embed(self, g, ctx, member: discord.Member=None):
         embed = discord.Embed(title=g.name, color=await ctx.embed_color()) if g.details is None else discord.Embed(title=g.name, description=f"{g.state}\n{g.details}", color=await ctx.embed_color())
-        if g.large_image_url is None:
-            embed.set_thumbnail(url=None if g.small_image_url is None else g.small_image_url)
-        else:
-            embed.set_thumbnail(url=g.large_image_url)
+        embed.set_thumbnail(url=g.small_image_url if g.large_image_url is None else g.large_image_url)
         if ctx.author.avatar is None:
             thing = ctx.author.default_avatar
         else:
@@ -26,10 +23,6 @@ class DiscordInfo(commands.Cog):
             embed.set_author(name=f"{member.nick}'s Activities", icon_url=thing)
         else:
             embed.set_author(name=f"{member.name}'s Activities", icon_url=thing)
-        if g.small_image_url is None:
-            pass
-        else:
-            embed.set_footer(text="", icon_url=g.small_image_url)
         return embed
 
     @commands.command()
@@ -41,13 +34,11 @@ class DiscordInfo(commands.Cog):
             guild = self.bot.get_guild(ctx.guild.id)
             try:
                 member = guild.get_member(user.id)
-                color = member.color
             except AttributeError:
                 member = None
-                color = await ctx.embed_color()
         else:
             member = None
-            color = await ctx.embed_color()
+        color = await ctx.embed_color() if not member else member.color
         embed = discord.Embed(title=f"{user.name}'s avatar", color=color)
         if user.avatar is None:
             url = user.default_avatar
@@ -107,7 +98,7 @@ class DiscordInfo(commands.Cog):
         if user.banner is None:
             if user is ctx.author:
                 await ctx.send("you haven't set a custom banner image!")
-            elif user.id == 954952445438599198:
+            elif user.id == ctx.me.id:
                 await ctx.send("i don't have a custom banner image!") 
             else:
                 await ctx.send("this user hasn't set a custom banner image!")
@@ -117,13 +108,11 @@ class DiscordInfo(commands.Cog):
                 guild = self.bot.get_guild(ctx.guild.id)
                 try:
                     member = guild.get_member(user.id)
-                    color = member.color
                 except AttributeError:
                     member = None
-                    color = await ctx.embed_color()
             else:
                 member = None
-                color = await ctx.embed_color()
+            color = await ctx.embed_color() if not member else member.color
             embed = discord.Embed(title=f"{user.name}'s banner", color=color)
             if user.banner.is_animated():
                 url = user.banner.replace(size=2048)
@@ -141,7 +130,7 @@ class DiscordInfo(commands.Cog):
                     thing += "&quality=lossless"
             embed.set_footer(text = f"executed by {ctx.author} for {user}", icon_url=thing)
             if user == ctx.author:
-                embed.set_footer(text = f"executed by {ctx.author}")
+                embed.set_footer(text = f"executed by {ctx.author}", icon_url=thing)
             await ctx.send(embed=embed)
 
     @commands.guild_only()
@@ -212,7 +201,8 @@ class DiscordInfo(commands.Cog):
                 member = None
         else:
             member = None
-        embed = discord.Embed(title=user, color=await ctx.embed_color())
+        color = await ctx.embed_color() if not member else member.color
+        embed = discord.Embed(title=user, color=color)
         if user.avatar is None:
             thing = user.default_avatar
         else:
@@ -239,7 +229,7 @@ class DiscordInfo(commands.Cog):
                 embed2.add_field(name="represents discord officially?", value=value, inline=False)
                 embed2.add_field(name="known spammer?", value=value, inline=False)
                 embed2.add_field(name="note", value="server avatar currently displayed", inline=False)
-                embed2.set_footer(text=f"dates are in UTC time \nID: {user.id}")
+                embed2.set_footer(text=f"ID: {user.id}")
                 thing = str(member.guild_avatar.replace(size=2048, static_format="webp"))
                 if member.guild_avatar.is_animated() is False:
                     thing += "&quality=lossless"
