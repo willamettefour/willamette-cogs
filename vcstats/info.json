@@ -1,0 +1,10 @@
+{
+  "author": ["willamette"],
+  "description": "Displays statistics in a voice channel.",
+  "install_msg": "thanks for installing `vcstats`!",
+  "short": "Tracks various stats in a voice channel.",
+  "end_user_data_statement": "This cog does not persistently store data or metadata about users.",
+  "min_python_version": [3, 7, 0],
+  "requirements": ["reactionmenu>=2.0.4"],
+  "tags": ["discord", "stats", "tracking"]
+}
