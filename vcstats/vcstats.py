@@ -17,7 +17,10 @@ class Vcstats(commands.Cog):
         self.config.register_global(guilds=[])
         self.config.register_guild(vcstats=[])
         self.setting.start()
-        
+    
+    def cog_unload(self):
+        self.setting.cancel()
+
     async def name_gen(self, guild, stat_val):
         # 1 = members
         # 2 = boosters
@@ -237,9 +240,9 @@ class Vcstats(commands.Cog):
         await ctx.send(embed=embed)
 
 
-    @tasks.loop(minutes=9.0)
+    @tasks.loop(minutes=10.0)
     async def setting(self):
-        await asyncio.sleep(60) # things WILL break if this isn't here
+        await self.bot.wait_until_ready()
         guilds = await self.config.guilds()
         for guild_id in guilds:
             guild = self.bot.get_guild(guild_id)
