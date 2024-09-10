@@ -1,0 +1,10 @@
+{
+  "author": ["willamette"],
+  "description": "Gets info/lyrics based on what's playing on a member's Spotify.",
+  "install_msg": "thanks for installing `spotify`! make sure to set your Genius API access token using [p]set api genius access_token,<your access token>",
+  "short": "Spotify commands.",
+  "end_user_data_statement": "This cog does not persistently store data or metadata about users.",
+  "min_bot_version": "3.5.0",
+  "requirements": ["reactionmenu>=3.0.0", "lyricsgenius"],
+  "tags": ["spotify", "lyrics"]
+}
