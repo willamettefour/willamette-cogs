@@ -11,11 +11,13 @@ class Spotify(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        global fuck_you
+        fuck_you = [115238234778370049, 416268491197513738, 598277022787043370, 644027020023693312, 651975050114891779, 778802790843678740, 792842038332358656, 855292122017169420, 1191423677397475428]
 
     async def lyric_scraping(self, ctx, artist, song):
         rapgenius = await self.bot.get_shared_api_tokens("genius")
         if rapgenius.get("access_token") is None:
-            if ctx.author is ctx.owner:
+            if ctx.author is ctx.guild.owner:
                 return await ctx.send(f"you haven't get one at https://genius.com/api-clients and use {ctx.prefix}set api genius access_token,<your access token>")
             else:
                 return await ctx.send(f"the bot owner hasn't set a genius api key; contact them to get spotify lyrics")
@@ -23,7 +25,11 @@ class Spotify(commands.Cog):
         song = genius.search_song(song, artist[0])
         if song:
             try:
-                lyrics = song.lyrics
+                for singer in artist:
+                    if singer in song.artist:
+                        lyrics = song.lyrics
+                    else:
+                        lyrics = ""
             except AttributeError:
                 lyrics = ""
         else:
@@ -43,7 +49,7 @@ class Spotify(commands.Cog):
         """   
         if member is None:
             member = ctx.author
-        if member.id in [115238234778370049, 416268491197513738, 598277022787043370, 644027020023693312, 651975050114891779, 778802790843678740, 792842038332358656, 855292122017169420, 1191423677397475428]:
+        if member.id in fuck_you:
             return await ctx.send("no 💖")
         spot = next((activity for activity in member.activities if isinstance(activity, discord.Spotify)), None)
         if spot is None:
@@ -93,7 +99,7 @@ class Spotify(commands.Cog):
         """Returns lyrics for a song being played by a member on Spotify"""
         if member is None:
             member = ctx.author
-        if member.id in [115238234778370049, 416268491197513738, 598277022787043370, 644027020023693312, 651975050114891779, 778802790843678740, 792842038332358656, 855292122017169420, 1191423677397475428]:
+        if member.id in fuck_you:
             return await ctx.send("no 💖")
         spot = next((activity for activity in member.activities if isinstance(activity, discord.Spotify)), None)
         if spot is None:
@@ -105,7 +111,11 @@ class Spotify(commands.Cog):
             "Definitely Maybe - 30th Anniversary Deluxe Edition":" - Remastered", 
             "(What's The Story) Morning Glory? (Deluxe Remastered Edition)":" - Remastered",
             "Be Here Now (Deluxe Remastered Edition)":" - Remastered",
-            "Back the Way We Came: Vol. 1 (2011 - 2021)":" - Remastered"}
+            "Back the Way We Came: Vol. 1 (2011 - 2021)":" - Remastered",
+            "Hopes And Fears 20":" - Remastered 2024",
+            "Little Creatures (Deluxe Version)":" - 2005 Remaster",
+            "The Best of Talking Heads":" - 2003 Remaster",
+            "Un Día Normal (20th Anniversary Remastered)":" - Remastered 2022"}
             artist_exceptions = {"Noel Gallagher's High Flying Birds":"Noel Gallagher", 
             "Liam Gallagher & John Squire":"Liam Gallagher"}
             try:
@@ -119,7 +129,6 @@ class Spotify(commands.Cog):
                         artists.append(artist_exceptions[artist])
                 except KeyError:
                     artists.append(artist)
-                
             lyrics = await self.lyric_scraping(ctx, artists, title)
         if lyrics == "":
             return await ctx.send("could not find the lyrics to this song.")
