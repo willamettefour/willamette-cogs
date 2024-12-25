@@ -142,7 +142,7 @@ class Spotify(commands.Cog):
                     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/745509182559748237/1279949791098568746/file-67.gif")
                 else:
                     embed.set_thumbnail(url=spot.album_cover_url)
-                embed.set_footer(text=f"\nsearched genius for \"{spot.artists[0]} {spot.title}\"", icon_url="https://willamette.is-a-cool-femboy.xyz/6Kyl0D2xx.webp")
+                embed.set_footer(text=f"\nsearched genius for \"{spot.artists[0]} {spot.title}\"", icon_url="https://willamette.is-a-cool-femboy.xyz/6Vb5MIiH2.webp")
                 paged_embeds.append(embed)
             if len(paged_embeds) >= 2:
                 time = spot.end - datetime.now(timezone.utc)
