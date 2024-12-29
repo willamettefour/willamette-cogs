@@ -1,5 +1,4 @@
 import discord
-import time
 
 from reactionmenu import ViewMenu, ViewButton
 from redbot.core import commands
@@ -140,7 +139,7 @@ class DiscordInfo(commands.Cog):
         embed = discord.Embed(title=ctx.guild.name, description=ctx.guild.description, color=await ctx.embed_color())
         bit = int(ctx.guild.bitrate_limit//1000)
         embed.add_field(name="perks", value=f"file limit: `{ctx.guild.filesize_limit//1048576}MB`\nemoji limit: `{ctx.guild.emoji_limit}`\nbitrate limit: `{bit}kbps`")
-        heathen = int(time.mktime(ctx.guild.created_at.timetuple()))
+        heathen = int(ctx.guild.created_at.timestamp())
         count = ctx.guild.member_count
         members = ctx.guild.members
         bot_count = 0
@@ -210,7 +209,7 @@ class DiscordInfo(commands.Cog):
             if user.avatar.is_animated() is False:
                 thing += "&quality=lossless"
         embed.set_thumbnail(url=thing)
-        heathen = int(time.mktime(user.created_at.timetuple()))
+        heathen = int(user.created_at.timestamp())
         embed.add_field(name="account created:", value=f"<t:{heathen}:D> (<t:{heathen}:R>)")
         value="❌" if user.system is False else "✅"
         embed.add_field(name="represents discord officially?", value=value, inline=False)
