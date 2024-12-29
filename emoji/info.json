@@ -1,0 +1,10 @@
+{
+  "author": ["willamette"],
+  "description": "Emoji-related tools.",
+  "install_msg": "thanks for installing `emoji`!",
+  "short": "Emoji-related commands.",
+  "end_user_data_statement": "This cog stores data provided by users for the express purpose of re-displaying. It does not store user data which was not provided through a command. Users may delete their own data with or without making a data request.",
+  "min_python_version": [3, 8, 0]
+  "requirements": ["requests"],
+  "tags": ["emoji"]
+}

@@ -307,14 +307,3 @@ class DiscordInfo(commands.Cog):
                 await ctx.send("i'm not doing anything! (i lack arms)")
             else:
                 await ctx.send("this member isn't doing anything (check the profile to make sure it's public!)")
-
-    @commands.command()
-    async def emojiinfo(self, ctx, emoji: discord.Emoji):
-        """Get info on a custom emoji."""
-        embed = discord.Embed(title=emoji.name, color=await ctx.embed_color())
-        heathen = int(time.mktime(emoji.created_at.timetuple()))
-        embed.add_field(name="emoji created:", value=f"<t:{heathen}:D> (<t:{heathen}:R>)")
-        embed.add_field(name="animated?", value="✅" if emoji.animated else "❌", inline=False)
-        embed.set_thumbnail(url=emoji.url if emoji.animated else emoji.url.replace(".png", ".webp?quality=lossless"))
-        embed.set_footer(text=f"ID: {emoji.id}")
-        await ctx.send(embed=embed)
