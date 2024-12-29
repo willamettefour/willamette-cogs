@@ -1,12 +1,1 @@
-{
-  "author": ["willamette"],
-  "install_msg": "thanks for installing `thumbnail`!",
-  "name": "thumbnail",
-  "short": "Get a YouTube video's thumbnail from its ID.",
-  "description": "Get a YouTube video's thumbnail from its ID.",
-  "disabled": false,
-  "requirements": ["requests", "git+https://github.com/oohlaf/python-whirlpool", "reactionmenu>=2.0.4"],
-  "permissions": ["embed_links"],
-  "min_python_version": [3, 7, 0],
-  "end_user_data_statement": "This cog does not persistently store data or metadata about users."
-}
+{"author": ["willamette"], "install_msg": "thanks for installing `thumbnail`!", "name": "thumbnail", "short": "Get a YouTube video's thumbnail from its ID.", "description": "Get a YouTube video's thumbnail from its ID.", "disabled": false, "requirements": ["requests", "git+https://github.com/oohlaf/python-whirlpool", "reactionmenu>=2.0.4"], "permissions": ["embed_links"], "min_python_version": [3, 7, 0], "end_user_data_statement": "This cog does not persistently store data or metadata about users."}
