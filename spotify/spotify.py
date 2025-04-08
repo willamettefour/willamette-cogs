@@ -18,7 +18,7 @@ class Spotify(commands.Cog):
         rapgenius = await self.bot.get_shared_api_tokens("genius")
         if rapgenius.get("access_token") is None:
             if ctx.author is ctx.guild.owner:
-                return await ctx.send(f"you haven't get one at https://genius.com/api-clients and use {ctx.prefix}set api genius access_token,<your access token>")
+                return await ctx.send(f"you haven't set a genius api key! get one at https://genius.com/api-clients, then use {ctx.prefix}set api genius access_token,<your access token>")
             else:
                 return await ctx.send(f"the bot owner hasn't set a genius api key; contact them to get spotify lyrics")
         genius = lyricsgenius.Genius(rapgenius["access_token"])
@@ -137,12 +137,12 @@ class Spotify(commands.Cog):
             paged_content = [p for p in pagify(lyrics, page_length=1024)]
             for index, page in enumerate(paged_content):
                 embed = discord.Embed(color = await ctx.embed_color(), description=page, title=spot.title)
-                embed.set_author(name="song lyrics", icon_url="https://willamette.is-a-cool-femboy.xyz/6KgufknDb.webp")
+                embed.set_author(name="song lyrics", icon_url="https://willamette.is-a-cool-femboy.xyz/73HZPNqxj.webp")
                 if "Eminem" in spot.artists and random.choice(99) == 69:
                     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/745509182559748237/1279949791098568746/file-67.gif")
                 else:
                     embed.set_thumbnail(url=spot.album_cover_url)
-                embed.set_footer(text=f"\nsearched genius for \"{spot.artists[0]} {spot.title}\"", icon_url="https://willamette.is-a-cool-femboy.xyz/6Vb5MIiH2.webp")
+                embed.set_footer(text=f"\nsearched genius for \"{spot.artists[0]} {spot.title}\"", icon_url="https://willamette.is-a-cool-femboy.xyz/73HxAWVjy.webp")
                 paged_embeds.append(embed)
             if len(paged_embeds) >= 2:
                 time = spot.end - datetime.now(timezone.utc)
