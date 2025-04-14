@@ -28,6 +28,8 @@ class Spotify(commands.Cog):
                 for singer in artist:
                     if singer in song.artist:
                         lyrics = song.lyrics
+                        if "Lyrics" in song.lyrics:
+                            lyrics = song.lyrics.split("Lyrics", 1)[1]
                     else:
                         lyrics = ""
             except AttributeError:
@@ -115,7 +117,8 @@ class Spotify(commands.Cog):
             "Hopes And Fears 20":" - Remastered 2024",
             "Little Creatures (Deluxe Version)":" - 2005 Remaster",
             "The Best of Talking Heads":" - 2003 Remaster",
-            "Un Día Normal (20th Anniversary Remastered)":" - Remastered 2022"}
+            "Un Día Normal (20th Anniversary Remastered)":" - Remastered 2022",
+            "Whenever You Need Somebody (Deluxe Edition - 2022 Remaster)":" (2022 Remaster)"}
             artist_exceptions = {"Noel Gallagher's High Flying Birds":"Noel Gallagher", 
             "Liam Gallagher & John Squire":"Liam Gallagher"}
             try:
