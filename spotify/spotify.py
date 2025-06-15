@@ -28,8 +28,10 @@ class Spotify(commands.Cog):
                 for singer in artist:
                     if singer in song.artist:
                         lyrics = song.lyrics
-                        if "Lyrics" in song.lyrics:
-                            lyrics = song.lyrics.split("Lyrics", 1)[1]
+                        for substring in ["Read More", "Lyrics"]:
+                            if substring in lyrics:
+                                lyrics = song.lyrics.split(substring, 1)[1]
+                        
                     else:
                         lyrics = ""
             except AttributeError:
@@ -110,7 +112,7 @@ class Spotify(commands.Cog):
             exceptions = {"Blur":" - 2012 Remaster", 
             "Blur (Special Edition)":" - 2012 Remaster", 
             "Definitely Maybe (Deluxe Edition Remastered)":" - Remastered", 
-            "Definitely Maybe - 30th Anniversary Deluxe Edition":" - Remastered", 
+            "Definitely Maybe (30th Anniversary Deluxe Edition)":" - Remastered", 
             "(What's The Story) Morning Glory? (Deluxe Remastered Edition)":" - Remastered",
             "Be Here Now (Deluxe Remastered Edition)":" - Remastered",
             "Back the Way We Came: Vol. 1 (2011 - 2021)":" - Remastered",
@@ -140,12 +142,12 @@ class Spotify(commands.Cog):
             paged_content = [p for p in pagify(lyrics, page_length=1024)]
             for index, page in enumerate(paged_content):
                 embed = discord.Embed(color = await ctx.embed_color(), description=page, title=spot.title)
-                embed.set_author(name="song lyrics", icon_url="https://willamette.is-a-cool-femboy.xyz/73HZPNqxj.webp")
+                embed.set_author(name="song lyrics", icon_url="https://willamette.is-a-cool-femboy.xyz/79_MjqSCH.webp")
                 if "Eminem" in spot.artists and random.choice(99) == 69:
                     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/745509182559748237/1279949791098568746/file-67.gif")
                 else:
                     embed.set_thumbnail(url=spot.album_cover_url)
-                embed.set_footer(text=f"\nsearched genius for \"{spot.artists[0]} {spot.title}\"", icon_url="https://willamette.is-a-cool-femboy.xyz/73HxAWVjy.webp")
+                embed.set_footer(text=f"\nsearched genius for \"{spot.artists[0]} {spot.title}\"", icon_url="https://willamette.is-a-cool-femboy.xyz/79_MjqSCI.webp")
                 paged_embeds.append(embed)
             if len(paged_embeds) >= 2:
                 time = spot.end - datetime.now(timezone.utc)
