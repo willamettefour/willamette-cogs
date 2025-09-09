@@ -12,12 +12,7 @@ class DiscordInfo(commands.Cog):
     async def build_embed(self, g, ctx, member: discord.Member=None):
         embed = discord.Embed(title=g.name, color=await ctx.embed_color()) if g.details is None else discord.Embed(title=g.name, description=f"{g.state}\n{g.details}", color=await ctx.embed_color())
         embed.set_thumbnail(url=g.small_image_url if g.large_image_url is None else g.large_image_url)
-        if ctx.author.avatar is None:
-            thing = ctx.author.default_avatar
-        else:
-            thing = str(ctx.author.display_avatar.replace(size=2048, static_format="webp"))
-            if ctx.author.display_avatar.is_animated() is False:
-                thing += "&quality=lossless"
+        thing = ctx.author.default_avatar if ctx.author.avatar is None else ctx.author.display_avatar if ctx.author.display_avatar.is_animated() is True else str(ctx.author.display_avatar.replace(size=2048, static_format="webp")) + "&quality=lossless"
         if member.nick:
             embed.set_author(name=f"{member.nick}'s Activities", icon_url=thing)
         else:
@@ -155,17 +150,17 @@ class DiscordInfo(commands.Cog):
             gay += "s"
         if bot_count > 1:
             sex += "s"
-        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, show_page_director=False, all_can_click=False)
         embed.add_field(name="membership", value=f"{count} members \n{human} {gay} / {bot_count} {sex} ({percent}%)\n:crown: <@{ctx.guild.owner_id}>")
         embed.add_field(name="created on", value=f"<t:{heathen}:D> (<t:{heathen}:R>)", inline=False)
-        embed.set_thumbnail(url=ctx.guild.icon if ctx.guild.icon.is_animated() else str(ctx.guild.icon.replace(size=1024, format="webp")) + "&quality=lossless")
-        embed.set_footer(text=f"ID: {ctx.guild.id} \n")
+        embed.set_thumbnail(url=None if ctx.guild.icon is None else ctx.guild.icon if ctx.guild.icon.is_animated() else str(ctx.guild.icon.replace(size=1024, format="webp")) + "&quality=lossless")
+        embed.set_footer(text=f"ID: {ctx.guild.id}")
         if ctx.guild.splash:
             if ctx.guild.banner is None:
                 embed.add_field(name="\u200b", value="**invite splash**")
                 embed.set_image(url=ctx.guild.splash)
                 await ctx.send(embed=embed)
             else:
+                menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, show_page_director=False, all_can_click=False)
                 embed.add_field(name="\u200b", value="**banner**")
                 embed.set_image(url=ctx.guild.banner)
                 embed2 = discord.Embed(title="invite splash", color=await ctx.embed_color())
@@ -183,10 +178,11 @@ class DiscordInfo(commands.Cog):
                 embed.set_image(url=ctx.guild.banner)
                 await ctx.send(embed=embed)
         else:
-            if ctx.guild.icon.is_animated() is False:
-                png = ctx.guild.icon.replace(size=1024, format="png")
-                jpg = ctx.guild.icon.replace(size=1024, format="jpeg")
-                embed.add_field(name="icon also available as", value=f"[png]({png}), [jpeg]({jpg})")
+            if ctx.guild.icon != None:
+                if ctx.guild.icon.is_animated() is False:
+                    png = ctx.guild.icon.replace(size=1024, format="png")
+                    jpg = ctx.guild.icon.replace(size=1024, format="jpeg")
+                    embed.add_field(name="icon also available as", value=f"[png]({png}), [jpeg]({jpg})")
             await ctx.send(embed=embed)
 
     @commands.command()
