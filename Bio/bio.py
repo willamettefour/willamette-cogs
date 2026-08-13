@@ -289,6 +289,7 @@ class Bio(commands.Cog):
                 else:
                     return await ctx.send(f"the attached file isn't a supported image format (avif, gif, jpeg, png, webp).")
             if field == "description":
+                socials = await self.config.member(member).socials()
                 true_social = [social for social in socials.keys() if social in Bio.full_socials]
                 max_desc_length = 162 - math.ceil(((math.ceil(len(member.display_name)/12) - 1)*37)/25)*27
                 if true_social:
