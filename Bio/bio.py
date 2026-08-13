@@ -208,8 +208,9 @@ class Bio(commands.Cog):
                 complete.save(profile_temp, "WEBP", lossless=True, quality=100, method=6)
                 profile_temp.seek(0)
                 file = discord.File(profile_temp, filename="profile.webp")
-                embed = discord.Embed(color=await ctx.embed_color())
-                embed.add_field(name="IMPORTANT!", value=f"this cog doesn't check for account ownership", inline=False)
+                if socials:
+                    embed = discord.Embed(color=await ctx.embed_color())
+                    embed.add_field(name="IMPORTANT!", value=f"this cog doesn't check for account ownership", inline=False)
                 if false_social:
                     embed.set_footer(text="for legal reasons, these platforms cannot be displayed in the main Bio image")
                     for social in false_social:
