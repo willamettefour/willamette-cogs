@@ -211,14 +211,16 @@ class Bio(commands.Cog):
                 if socials:
                     embed = discord.Embed(color=await ctx.embed_color())
                     embed.add_field(name="IMPORTANT!", value=f"this cog doesn't check for account ownership", inline=False)
-                if false_social:
-                    embed.set_footer(text="for legal reasons, these platforms cannot be displayed in the main Bio image")
-                    for social in false_social:
-                        if social == "carrd" or social == "linktree":
-                            name = social
-                        else:
-                            name = "last.fm"
-                        embed.add_field(name=name, value=f"{socials[social]}")
+                    if false_social:
+                        embed.set_footer(text="for legal reasons, these platforms cannot be displayed in the main Bio image")
+                        for social in false_social:
+                            if social == "carrd" or social == "linktree":
+                                name = social
+                            else:
+                                name = "last.fm"
+                            embed.add_field(name=name, value=f"{socials[social]}")
+                else:
+                    embed = None
                 try:
                     await ctx.send(file=file, embed=embed, view=view)
                 except UnboundLocalError:
