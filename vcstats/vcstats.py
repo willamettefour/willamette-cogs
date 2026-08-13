@@ -10,14 +10,18 @@ from redbot.core import Config, checks, commands
 
 class Vcstats(commands.Cog):
     """Tracks various stats in a voice channel."""
-
+    valid_stats = ["members", "boosters", "roles", "textchannels", "voicechannels", "guildowner", "bannedusers", "emojis", "guildid", "guildname", "botservers", "botusers"]
+    
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=8086, force_registration=True)
+        self.config = Config.get_conf(self, identifier=4153800057, force_registration=True)
         self.config.register_global(guilds=[])
         self.config.register_guild(vcstats=[])
         self.setting.start()
-    
+
+    async def red_delete_data_for_user(self, *, requester, user_id: int) -> None:
+        pass
+
     def cog_unload(self):
         self.setting.cancel()
 
@@ -69,7 +73,7 @@ class Vcstats(commands.Cog):
 
     async def menu_gen(self, ctx, test_list, numero):
         start = 0
-        end = 40
+        end = 36
         channels_list = []
         if discord.__version__[0] == "2":
             menu = ViewMenu(ctx, style='page $/&', menu_type=ViewMenu.TypeEmbed)
@@ -79,17 +83,17 @@ class Vcstats(commands.Cog):
             menu.add_button(next_button)
         else:
             menu = ReactionMenu(ctx, back_button='◀️', next_button='▶️', style='page $/&', config=ReactionMenu.STATIC)
-        if len(test_list) > 80:
+        if len(test_list) > 72:
             if discord.__version__[0] == "2":
                 gtpb = ViewButton(style=discord.ButtonStyle.primary, emoji='🔢', label='Menu' ,custom_id=ViewButton.ID_GO_TO_PAGE)
             else:
                 gtpb = Button(emoji='🔢', linked_to=ButtonType.GO_TO_PAGE)
             menu.add_button(gtpb)
-        while start <= len(test_list):
+        while start < len(test_list):
             splits = test_list[start:end]
             channels_list.append(splits)
-            start += 40
-            end += 40
+            start += 36
+            end += 36
         for fragment in channels_list:
             voice_channels = ""
             for voice_channel in fragment:
@@ -110,37 +114,35 @@ class Vcstats(commands.Cog):
     async def add(self, ctx, stat, channel: discord.VoiceChannel = None):
         """Adds a stat to be tracked."""
         if channel is None:
-            vc_ids = []
+            channels = ctx.guild.voice_channels
+            if not channels:
+                return await ctx.send("this server has no voice channels.")
             numero = 1
-            if len(ctx.guild.voice_channels) <= 40:
+            if len(channels) <= 36:
                 voice_channels = ""
                 for vc in ctx.guild.voice_channels:
-                    numero_str = str(numero)
-                    voice_channels += f"{numero_str}. <#{vc.id}>\n"
-                    vc_ids.append(vc.id)
+                    voice_channels += f"{numero}. <#{vc.id}>\n"
                     numero += 1
                 embed = discord.Embed(color=await ctx.embed_color())
                 embed.add_field(name="voice channels", value=voice_channels)
                 await ctx.send("please respond with the number of the voice channel you would like to select for VCStats", embed=embed)
             else:
-                test_list = ctx.guild.voice_channels
-                menu = await self.menu_gen(ctx, test_list, numero)
+                menu, numero = await self.menu_gen(ctx, channels, numero)
                 await menu.start(send_to = ctx.channel)
-        def check(m):
-            return m.content.isdigit() is True and m.channel == ctx.channel and ctx.author == m.author
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout = 60.0)
-        except asyncio.TimeoutError:
-            return await ctx.send("timeout reached; please try again")
-        msg = int(msg.content)
-        if msg in range(1, numero + 1):
-            channel = self.bot.get_channel(vc_ids[msg - 1])
-        else:
-            return await ctx.send("an invalid input was sent; please try again")
+            def check(m):
+                return m.content.isdigit() is True and m.channel == ctx.channel and ctx.author == m.author
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout = 60.0)
+            except asyncio.TimeoutError:
+                return await ctx.send("timeout reached; please try again")
+            msg = int(msg.content)
+            if msg in range(1, numero):
+                channel = channels[msg - 1]
+            else:
+                return await ctx.send("an invalid input was sent; please try again")
         stat = stat.lower()
-        stats = ["members", "boosters", "roles", "textchannels", "voicechannels", "guildowner", "bannedusers", "emojis", "guildid", "guildname", "botservers", "botusers"]
-        if stat in stats:
-            stat_val = stats.index(stat.lower())
+        if stat in Vcstats.valid_stats:
+            stat_val = Vcstats.valid_stats.index(stat.lower())
             guilds = await self.config.guilds()
             if ctx.guild.id not in guilds:
                 guilds.append(ctx.guild.id)
@@ -162,8 +164,7 @@ class Vcstats(commands.Cog):
                         else:
                             return await ctx.send(f"`{stat}` will not be tracked in <#{channel.id}>")
             the_list.append([channel.id, stat_val])
-            guild = ctx.guild
-            new_name = await self.name_gen(guild, stat_val)
+            new_name = await self.name_gen(ctx.guild, stat_val)
             if new_name != channel.name:
                 try:
                     await channel.edit(name=new_name)
@@ -178,11 +179,12 @@ class Vcstats(commands.Cog):
     @vcstats.command()
     async def remove(self, ctx, stat, channel: discord.VoiceChannel = None):
         """Removes a stat to be tracked"""
+        if channel and channel.guild != ctx.guild:
+            return await ctx.send("you cannot make changes to channels in a different guild.")
         the_list = await self.config.guild(ctx.guild).vcstats()
-        stats = ["members", "boosters", "roles", "textchannels", "voicechannels", "guildowner", "bannedusers", "emojis", "guildid", "guildname", "botservers", "botusers"]
         stat = stat.lower()
-        if stat in stats:
-            stat_val = stats.index(stat.lower())
+        if stat in Vcstats.valid_stats:
+            stat_val = Vcstats.valid_stats.index(stat.lower())
         else:
             return await ctx.send(f"invalid stat was requested; please use a stat listed by `{ctx.prefix}vcstats stats`")
         if channel is None:
@@ -200,7 +202,7 @@ class Vcstats(commands.Cog):
                 channel = tracked_channels[0]
             else:
                 numero = 1
-                if len(tracked_channels) > 1 and len(tracked_channels) <= 40:
+                if len(tracked_channels) > 1 and len(tracked_channels) <= 36:
                     voice_channels = ""
                     for vc in tracked_channels:
                         numero_str = str(numero)
@@ -209,7 +211,7 @@ class Vcstats(commands.Cog):
                     embed = discord.Embed(color=await ctx.embed_color())
                     embed.add_field(name="voice channels", value=voice_channels)
                     await ctx.send("please respond with the number of the voice channel you would like to select for VCStats", embed=embed)
-                if len(tracked_channels) > 40:
+                if len(tracked_channels) > 36:
                     menu, numero = await self.menu_gen(ctx, tracked_channels, numero)
                     await menu.start(send_to = ctx.channel)
                 def check(m):
@@ -219,37 +221,55 @@ class Vcstats(commands.Cog):
                 except asyncio.TimeoutError:
                     return await ctx.send("timeout reached; please try again")
                 msg = int(msg.content)
-                if msg in range(1, numero + 1):
+                if msg in range(1, numero):
                     channel = tracked_channels[msg - 1]
                 else:
                     return await ctx.send("an invalid input was sent; please try again")
         if [channel.id, stat_val] in the_list:
-            the_list.remove([channel.id, stat_val])
-            await self.config.guild(ctx.guild).vcstats.set(the_list)
+            if len(the_list) == 1:
+                await self.config.guild(ctx.guild).vcstats.clear()
+                guilds = await self.config.guilds()
+                guilds.remove(ctx.guild.id)
+                await self.config.guilds.set(guilds)
+            else:
+                the_list.remove([channel.id, stat_val])
+                await self.config.guild(ctx.guild).vcstats.set(the_list)
             await ctx.send(f"stat `{stat}` is no longer being tracked in <#{channel.id}>")
-        
+        else:
+            await ctx.send(f"stat `{stat}` was not tracked in <#{channel.id}>.")
+            
     @vcstats.command()
     async def stats(self, ctx):
         """Lists the stats which can be tracked."""
         the_dollar = ""
-        stats = ["members", "boosters", "roles", "textchannels", "voicechannels", "guildowner", "bannedusers", "emojis", "guildid", "guildname", "botservers", "botusers"]
-        for stat in stats:
+        for stat in Vcstats.valid_stats:
             the_dollar += f"- {stat}\n"
         embed = discord.Embed(color=await ctx.embed_color())
         embed.add_field(name="valid options:", value=the_dollar)
         await ctx.send(embed=embed)
 
-
     @tasks.loop(minutes=10.0)
     async def setting(self):
-        await self.bot.wait_until_ready()
         guilds = await self.config.guilds()
         for guild_id in guilds:
             guild = self.bot.get_guild(guild_id)
-            the_list = await self.config.guild(guild).vcstats()
-            for channels in the_list:
-                channel = self.bot.get_channel(channels[0])
-                stat_val = channels[1]
-                new_name = await self.name_gen(guild, stat_val)
-                if channel.name != new_name:
-                    await channel.edit(name=new_name)
+            if guild is not None:
+                the_list = await self.config.guild(guild).vcstats()
+                for channels in the_list:
+                    channel = self.bot.get_channel(channels[0])
+                    if channel is not None:
+                        stat_val = channels[1]
+                        try:
+                            new_name = await self.name_gen(guild, stat_val)
+                            if channel.name != new_name:
+                                await channel.edit(name=new_name)
+                        except discord.HTTPException:
+                            pass
+                            
+    @setting.before_loop
+    async def before_setting(self):
+        await self.bot.wait_until_red_ready()
+        
+    @setting.error
+    async def setting_error(self, error):
+        self.setting.restart()

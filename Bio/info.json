@@ -1,0 +1,12 @@
+{
+	"author": ["willamette"], 
+	"install_msg": "thanks for installing `Bio`! please note that backgrounds are stored in a separate folder in your bot's data path.", 
+	"name": "Bio", 
+	"short": "Creates and displays Bios.", 
+	"description": "Creates and displays Bios.", 
+	"disabled": false, 
+	"requirements": ["aiohttp", "pillow", "requests", "validators", "word2num"], 
+	"permissions": ["add_reactions", "attach_files"], 
+	"min_python_version": [3, 10, 0], 
+	"end_user_data_statement": "This cog downloads images and stores social media handles and other customizations given by users for their Bios. This data may be viewable by other members on the same server."
+}

@@ -1,8 +1,8 @@
+import asyncio
+import aiohttp
 import discord
-import os
-import random, string
+import re
 import requests
-import time
 import whirlpool
 
 from redbot.core import commands
@@ -10,30 +10,33 @@ from redbot.core import commands
 
 class Thumbnail(commands.Cog):
     """Get a YouTube video's thumbnail from its ID."""
+    default_hash = "A005E211EDD213842ED25A9EBFCD4D4E19A3A69DD2D899F899B4307740110651880FF8A8D2F7B95188AF87D62ECC09F401E1A405050A6A4A228497C51EAD3D88"
 
     def __init__(self, bot):
-        global default_hash
-        default_hash = "A005E211EDD213842ED25A9EBFCD4D4E19A3A69DD2D899F899B4307740110651880FF8A8D2F7B95188AF87D62ECC09F401E1A405050A6A4A228497C51EAD3D88"
         self.bot = bot
+        self.session = aiohttp.ClientSession()
 
-    async def hashing(self, code, quality):
-        script_path = os.path.realpath(__file__)
-        script_dir = os.path.dirname(script_path)
-        directory = "imgcache"
-        path = os.path.join(script_dir, directory)
-        os.makedirs(path, exist_ok=True)
-        img_name = ''.join(random.choice(string.ascii_letters) for _ in range(32))
-        image_url = f"https://i.ytimg.com/vi/{code}/{quality}.jpg"
-        img_data = requests.get(image_url).content
-        h = whirlpool.new()
-        with open(f'{script_dir}/imgcache/{img_name}.jpg', 'wb') as handler:
-            handler.write(img_data)
-        with open(f'{script_dir}/imgcache/{img_name}.jpg', 'rb') as f:
-            file_data = f.read()
+    async def cog_unload(self):
+        await self.session.close()
+        
+    async def red_delete_data_for_user(self, *, requester, user_id: int) -> None:
+        pass
+
+    async def hashing(self, ctx, code, quality):
+        url = f"https://i.ytimg.com/vi/{code}/{quality}.jpg"
         hasher = whirlpool.new()
-        hasher.update(file_data)
+        try:
+            with requests.get(url, stream=True) as response:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        hasher.update(chunk)
+        except requests.exceptions.HTTPError:
+            if quality == "maxresdefault":
+                resolution = "high"
+            else:
+                resolution = "low"
+            await ctx.send(f"failed to download {resolution} resolution thumbnail with error `{response.status_code}`.")
         file_hash = hasher.hexdigest()
-        os.remove(f"{script_dir}/imgcache/{img_name}.jpg")
         return file_hash
  
     async def build_embed(self, ctx, url):
@@ -55,26 +58,27 @@ class Thumbnail(commands.Cog):
                     thing_av = req["avatar"]
                     if thing_av:
                         maid_url = f"https://cdn.discordapp.com/guilds/{ctx.guild.id}/users/{ctx.author.id}/avatars/{thing_av}"
-                        thing = maid_url + ".gif?size=2048" if requests.get(maid_url).headers['content-type'] == "image/gif" else maid_url + ".webp?size=2048&quality=lossless"
+                        async with self.session.head(maid_url, allow_redirects=True) as res:
+                            file_type = res.headers.get("content-type", "").split(";")[0].strip().lower()
+                        thing = maid_url + ".gif?size=2048" if file_type == "image/gif" else maid_url + ".webp?size=2048&quality=lossless"
         embed.set_footer(text = f"executed by {ctx.author}", icon_url=thing)
         return embed
 
     @commands.command()
     async def thumbnail(self, ctx, code: str):
         """Get a YouTube video's thumbnail from its ID."""
-        if len(code) != 11:
-            await ctx.send("That ID appears to be invalid!")
-        else:
-            file_hash = await self.hashing(code, "maxresdefault")
-            if file_hash.upper() == default_hash:
-                file_hash = await self.hashing(code, "hqdefault")
-                if file_hash.upper() == default_hash:
-                    await ctx.send("the code provided is either invalid or the video has no thumbnail")
+        if not re.fullmatch(r"[A-Za-z0-9_-]{11}", code):
+            return await ctx.send("that ID appears to be invalid!")
+        async with ctx.typing():
+            file_hash = await self.hashing(ctx, code, "maxresdefault")
+            if file_hash.upper() == Thumbnail.default_hash:
+                file_hash = await self.hashing(ctx, code, "hqdefault")
+                if file_hash.upper() == Thumbnail.default_hash:
+                    await ctx.send("the code provided is either invalid or the video has no thumbnail.")
                 else:
-                    async with ctx.typing():
-                        url = f"https://i.ytimg.com/vi/{code}/hqdefault.jpg"
-                        embed = await self.build_embed(ctx, url)
-                        await ctx.send(embed=embed)
+                    url = f"https://i.ytimg.com/vi/{code}/hqdefault.jpg"
+                    embed = await self.build_embed(ctx, url)
+                    await ctx.send(embed=embed)
             else:
                 url = f"https://i.ytimg.com/vi/{code}/maxresdefault.jpg"
                 embed = await self.build_embed(ctx, url)

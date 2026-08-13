@@ -1,9 +1,6 @@
-import asyncio
 import discord
-import os
-import random, string
+import io
 import requests
-import time
 import zipfile
 
 from redbot.core import checks, commands, Config
@@ -14,8 +11,11 @@ class Emoji(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=8086, force_registration=True)
+        self.config = Config.get_conf(self, identifier=4153800057, force_registration=True)
         self.config.register_user(image_format=[])
+        
+    async def red_delete_data_for_user(self, *, requester, user_id: int) -> None:
+        await self.config.user_from_id(user_id).clear()
 
     @commands.group()
     async def emoji(self, ctx):
@@ -47,7 +47,7 @@ class Emoji(commands.Cog):
     async def info(self, ctx, emoji: discord.Emoji):
         """Get info on a custom emoji."""
         embed = discord.Embed(title=emoji.name, color=await ctx.embed_color())
-        heathen = int(time.mktime(emoji.created_at.timetuple()))
+        heathen = int(emoji.created_at.timestamp())
         embed.add_field(name="emoji created:", value=f"<t:{heathen}:D> (<t:{heathen}:R>)")
         embed.add_field(name="animated?", value="✅" if emoji.animated else "❌", inline=False)
         saved_format = await self.config.user(ctx.author).image_format()
@@ -85,62 +85,47 @@ class Emoji(commands.Cog):
                 await ctx.guild.create_custom_emoji(name=name, image=await emoji.url.read(), reason=f"emoji added by {ctx.author.display_name} through {ctx.me.display_name}")
             await ctx.message.add_reaction("✅")
         except:
-            await ctx.send("i couldn't add that emoji! please check if the guild has reached its limit")
+            await ctx.send("i couldn't add that emoji! please check if the guild has reached its limit.")
             
     @emoji.command()
     @commands.guild_only()
     async def zip(self, ctx):
         """Creates a zip file with the current server's emojis."""
-        if ctx.guild.emojis is None:
+        if not ctx.guild.emojis:
             return await ctx.send("this server has no custom emojis")
         async with ctx.typing():
-            script_path = os.path.realpath(__file__)
-            script_dir = os.path.dirname(script_path)
-            directory = ''.join(random.choice(string.ascii_letters) for _ in range(32))
-            path = os.path.join(script_dir, directory)
-            os.makedirs(path, exist_ok=True)
             saved_format = await self.config.user(ctx.author).image_format()
-            for emoji in ctx.guild.emojis:
-                emoji_url = emoji.url
-                extension = "gif"
-                if not emoji.animated:
-                    if discord.__version__[0] == "2":
-                        if not saved_format or saved_format == "webp_ls":
-                            extension = "webp"
-                            emoji_url = emoji.url.replace(".png", ".webp?quality=lossless")
-                        if saved_format == "webp":
-                            extension = "webp"
-                            emoji_url = emoji.url.replace(".png", ".webp")
-                        if saved_format == "jpeg":
-                            extension = "jpg"
-                            emoji_url = emoji.url.replace(".png", ".jpg")
-                    else:
-                        if not saved_format or saved_format == "webp_ls":
-                            extension = "webp"
-                            emoji_url = str(emoji.url_as(format="webp")) + "?quality=lossless"
-                        if saved_format == "webp":
-                            extension = "webp"
-                            emoji_url = str(emoji.url_as(format="webp"))
-                        if saved_format == "jpeg":
-                            extension = "jpg"
-                            emoji_url = str(emoji.url_as(format="jpg"))
-                img_data = requests.get(emoji_url).content
-                with open(f'{script_dir}/{directory}/{emoji.name}.{extension}', 'wb') as handler:
-                    handler.write(img_data)
-            with zipfile.ZipFile(f'{script_dir}/{directory}.zip', 'w') as zipf:
-                for foldername, subfolders, filenames in os.walk(path):
-                    for filename in filenames:
-                        file_path = os.path.join(foldername, filename)
-                        zipf.write(file_path, os.path.relpath(file_path, path))
-            file = discord.File(f'{script_dir}/{directory}.zip')
+            emoji_temp = io.BytesIO()
+            with zipfile.ZipFile(emoji_temp, 'w') as zipf:
+                for emoji in ctx.guild.emojis:
+                    emoji_url = emoji.url
+                    extension = "gif"
+                    if not emoji.animated:
+                        if discord.__version__[0] == "2":
+                            if not saved_format or saved_format == "webp_ls":
+                                extension = "webp"
+                                emoji_url = emoji.url.replace(".png", ".webp?quality=lossless")
+                            if saved_format == "webp":
+                                extension = "webp"
+                                emoji_url = emoji.url.replace(".png", ".webp")
+                            if saved_format == "jpeg":
+                                extension = "jpg"
+                                emoji_url = emoji.url.replace(".png", ".jpg")
+                        else:
+                            if not saved_format or saved_format == "webp_ls":
+                                extension = "webp"
+                                emoji_url = str(emoji.url_as(format="webp")) + "?quality=lossless"
+                            if saved_format == "webp":
+                                extension = "webp"
+                                emoji_url = str(emoji.url_as(format="webp"))
+                            if saved_format == "jpeg":
+                                extension = "jpg"
+                                emoji_url = str(emoji.url_as(format="jpg"))
+                    img_data = requests.get(emoji_url).content
+                    zipf.writestr(f"{emoji.id}.{extension}", img_data)
+            emoji_temp.seek(0)
             try:
+                file = discord.File(emoji_temp, filename=f"{ctx.guild.id}-emojis.zip")
                 await ctx.send(file=file)
-            except:
-                await ctx.send("i can't send the zip archive! it's possible the file is bigger than the server's file limit, in which case consider using a lossy format if you weren't before")
-            for filename in os.listdir(path):
-                file_path = os.path.join(path, filename) 
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-            os.rmdir(path)
-            os.remove(f"{script_dir}/{directory}.zip")
-            await ctx.message.add_reaction("✅")
+            except discord.HTTPException:
+                await ctx.send("i can't send the zip archive! it's possible the file is bigger than the server's file limit, in which case consider using a lossy format if you weren't before.")
