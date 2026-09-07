@@ -1,0 +1,11 @@
+{
+	"author": ["willamette"], 
+	"install_msg": "thanks for installing `translate`!", 
+	"name": "translate", 
+	"short": "Translates text using DeepL.", 
+	"description": "Translates text using DeepL.", 
+	"disabled": false, 
+	"requirements": ["deepl"], 
+	"min_python_version": [3, 9, 0], 
+	"end_user_data_statement": "This cog does not persistently store data or metadata about users."
+}
