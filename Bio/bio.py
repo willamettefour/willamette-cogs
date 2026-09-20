@@ -18,7 +18,7 @@ from redbot.core import commands, Config
 from redbot.core.data_manager import bundled_data_path, cog_data_path
 from word2num import word2num
 
-from claudescorner import draw_text_with_glass, to_rgb_tuple, validate_color
+from .claudescorner import draw_text_with_glass, to_rgb_tuple, validate_color
 
 class Bio(commands.Cog):
     """Create and display Bios."""
