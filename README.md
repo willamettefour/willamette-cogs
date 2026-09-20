@@ -7,4 +7,5 @@
 | Emoji | Emoji-related tools. | ✅ |
 | spotify | Get info/lyrics based on what's playing on a member's Spotify. | ❌ |
 | thumbnail | Get a YouTube video's thumbnail from its ID. | ✅ |
+| translate | Translates text using DeepL. | ✅ |
 | vcstats | Tracks various stats in a voice channel. | ✅ |
